@@ -17,3 +17,13 @@
   (deactivate)="onDeactivate($event)"
   >
 </ngx-charts-line-chart>
+
+<!-- Input field -->
+<input type="number" id="course" name="course" class="form-control" [(ngModel)]="playerId" placeholder="Enter course name">
+<!-- Add button -->
+<button (click)="addPlayerId()">Add</button>
+
+<button (click)="plotGraph()"> Plot graph</button>
+
+<hr>
+{{playerIds|json}}

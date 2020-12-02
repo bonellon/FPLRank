@@ -13,6 +13,7 @@ import { FplPlayerRank, Node, Series } from '../models/PlayerRank';
   styleUrls: ['./rank-comparison.component.scss'],
 })
 export class RankComparisonComponent implements OnInit {
+
   players: Node[] = [];
 
   multi: any[];
@@ -30,6 +31,9 @@ export class RankComparisonComponent implements OnInit {
   yAxisLabel: string = 'Points';
   timeline: boolean = false;
 
+  playerId: number = 0;
+  playerIds: number[] = [];
+
   colorScheme = {
     domain: ['#5AA454', '#E44D25', '#CFC0BB', '#7aa3e5', '#a8385d', '#aae3f5'],
   };
@@ -38,37 +42,42 @@ export class RankComparisonComponent implements OnInit {
     Object.assign(this, { multi });
   }
 
-  ngOnInit(): void {
-    console.log('init');
+  ngOnInit(): void {}
 
-    this.api.GetPlayerGameweekScores(35122).subscribe((data) => {
-      this.addPlayer(35122, data);
+  
+  addPlayerId() {
+    console.log(this.playerId);
+    if (!this.playerIds.includes(this.playerId)) {
+      this.playerIds.push(this.playerId);
+    }
 
-      this.multi = [];
-      this.multi = this.players;
-      console.log('Updated multi..');
-    });
-
-    this.api.GetPlayerGameweekScores(351333).subscribe((data) => {
-      this.addPlayer(351333, data);
-
-      this.multi = JSON.parse(JSON.stringify(this.players));
-      console.log('Updated multi..');
-      console.log(this.players)
-    });
+    //Reset input
+    this.playerId = 0;
   }
 
-  addPlayer(playerId: number, fplPlayer: FplPlayerRank) {
-    console.log(fplPlayer);
-    this.players.push(
-      new Node(
-        playerId.toString(),
-        fplPlayer.current.map(
-          (f) => new Series(f.total_points, f.event.toString())
+  async addPlayer(playerId: number) {
+    this.api.GetPlayerGameweekScores(playerId).subscribe((data) => {
+            this.players.push(
+        new Node(
+          playerId.toString(),
+          data.current.map(
+            (f) => new Series(f.total_points, f.event.toString())
+          )
         )
-      )
-    );
-    console.log(JSON.stringify(this.players));
+      );
+      console.log(JSON.stringify(this.players));
+    });
+
+  }
+
+  plotGraph() {
+    this.playerIds.forEach(async playerId => {
+      console.log("Adding player: "+playerId);
+      await this.addPlayer(playerId);
+    });
+
+    this.multi = JSON.parse(JSON.stringify(this.players))
+    console.log(this.multi)
   }
 
   onSelect(data): void {
