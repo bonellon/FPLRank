@@ -1,5 +1,9 @@
 export class FplPlayerRank {
     current : GameweekScore[];
+
+    constructor(current : GameweekScore[]){
+        this.current = current;
+    }
 }
 
 export class GameweekScore {
