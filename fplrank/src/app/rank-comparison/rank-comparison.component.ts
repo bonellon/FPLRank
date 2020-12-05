@@ -7,13 +7,15 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FplApiService } from '../services/FplApiService';
 import { multi } from '../data';
 import { FplPlayerRank, Node, Series } from '../models/PlayerRank';
+import { Observable } from 'rxjs';
+import { first, take } from 'rxjs/operators';
+
 @Component({
   selector: 'rank-comparison',
   templateUrl: './rank-comparison.component.html',
   styleUrls: ['./rank-comparison.component.scss'],
 })
 export class RankComparisonComponent implements OnInit {
-
   players: Node[] = [];
 
   multi: any[];
@@ -44,7 +46,6 @@ export class RankComparisonComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  
   addPlayerId() {
     console.log(this.playerId);
     if (!this.playerIds.includes(this.playerId)) {
@@ -55,8 +56,11 @@ export class RankComparisonComponent implements OnInit {
     this.playerId = 0;
   }
 
-  async addPlayer(playerId: number) {
-    this.api.GetPlayerGameweekScores(playerId).subscribe((data) => {
+  addPlayer(playerId: number) {
+    return this.api.GetPlayerGameweekScores(playerId).pipe(first()).toPromise();
+  }
+  /*
+.subscribe((data) => {
             this.players.push(
         new Node(
           playerId.toString(),
@@ -67,17 +71,35 @@ export class RankComparisonComponent implements OnInit {
       );
       console.log(JSON.stringify(this.players));
     });
+    */
 
+  async testPromise() {
+    var x = await this.addPlayer(3);
+    console.log(x);
   }
 
-  plotGraph() {
-    this.playerIds.forEach(async playerId => {
-      console.log("Adding player: "+playerId);
-      await this.addPlayer(playerId);
+  async plotGraph() {
+    var promiseArray = []
+    for await (var playerId of this.playerIds) {
+      console.log('Adding player: ' + playerId);
+      promiseArray.push(this.addPlayer(playerId));
+    }
+
+    var fplPlayer = await Promise.all(promiseArray);
+    fplPlayer.forEach(player => {
+      this.players.push(
+        new Node(
+          playerId.toString(),
+          player.current.map(
+            (f) => new Series(f.total_points, f.event.toString())
+          )
+        )
+      );
     });
 
-    this.multi = JSON.parse(JSON.stringify(this.players))
-    console.log(this.multi)
+    console.log(this.players);
+    this.multi = JSON.parse(JSON.stringify(this.players));
+    console.log(this.multi);
   }
 
   onSelect(data): void {
