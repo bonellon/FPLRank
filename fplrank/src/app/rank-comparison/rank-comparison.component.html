@@ -1,29 +1,35 @@
 <p>rank-comparison works!</p>
 
-<ngx-charts-line-chart
-  [view]="view"
-  [scheme]="colorScheme"
-  [legend]="legend"
-  [showXAxisLabel]="showXAxisLabel"
-  [showYAxisLabel]="showYAxisLabel"
-  [xAxis]="xAxis"
-  [yAxis]="yAxis"
-  [xAxisLabel]="xAxisLabel"
-  [yAxisLabel]="yAxisLabel"
-  [timeline]="timeline"
-  [results]="multi"
-  (select)="onSelect($event)"
-  (activate)="onActivate($event)"
-  (deactivate)="onDeactivate($event)"
+  <ngx-charts-line-chart
+    [scheme]="colorScheme"
+    [legend]="legend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxis]="xAxis"
+    [yAxis]="yAxis"
+    [xAxisLabel]="xAxisLabel"
+    [yAxisLabel]="yAxisLabel"
+    [timeline]="timeline"
+    [results]="multi"
+    (select)="onSelect($event)"
+    (activate)="onActivate($event)"
+    (deactivate)="onDeactivate($event)"
   >
-</ngx-charts-line-chart>
+  </ngx-charts-line-chart>
 
 <!-- Input field -->
-<input type="number" id="course" name="course" class="form-control" [(ngModel)]="playerId" placeholder="Enter course name">
+<input
+  type="number"
+  id="course"
+  name="course"
+  class="form-control"
+  [(ngModel)]="playerId"
+  placeholder="Enter course name"
+/>
 <!-- Add button -->
 <button (click)="addPlayerId()">Add</button>
 
-<button (click)="plotGraph()"> Plot graph</button>
+<button (click)="plotGraph()">Plot graph</button>
 
-<hr>
-{{playerIds|json}}
+<hr />
+{{ playerIds | json }}

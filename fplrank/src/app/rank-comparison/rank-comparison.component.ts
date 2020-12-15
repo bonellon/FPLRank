@@ -33,7 +33,7 @@ export class RankComparisonComponent implements OnInit {
   yAxisLabel: string = 'Points';
   timeline: boolean = false;
 
-  playerId: number = 0;
+  playerId: number = 1;
   playerIds: number[] = [];
 
   colorScheme = {
@@ -53,40 +53,21 @@ export class RankComparisonComponent implements OnInit {
     }
 
     //Reset input
-    this.playerId = 0;
-  }
-
-  addPlayer(playerId: number) {
-    return this.api.GetPlayerGameweekScores(playerId).pipe(first()).toPromise();
-  }
-  /*
-.subscribe((data) => {
-            this.players.push(
-        new Node(
-          playerId.toString(),
-          data.current.map(
-            (f) => new Series(f.total_points, f.event.toString())
-          )
-        )
-      );
-      console.log(JSON.stringify(this.players));
-    });
-    */
-
-  async testPromise() {
-    var x = await this.addPlayer(3);
-    console.log(x);
+    this.playerId = 1;
   }
 
   async plotGraph() {
-    var promiseArray = []
+    var promiseArray = [];
     for await (var playerId of this.playerIds) {
       console.log('Adding player: ' + playerId);
-      promiseArray.push(this.addPlayer(playerId));
+
+      if (this.players.find((p) => p.name == playerId.toString()) === undefined) {
+        promiseArray.push(this.addPlayer(playerId));
+      }
     }
 
-    var fplPlayer = await Promise.all(promiseArray);
-    fplPlayer.forEach(player => {
+    var fplPlayers = await Promise.all(promiseArray);
+    fplPlayers.forEach((player) => {
       this.players.push(
         new Node(
           playerId.toString(),
@@ -100,6 +81,10 @@ export class RankComparisonComponent implements OnInit {
     console.log(this.players);
     this.multi = JSON.parse(JSON.stringify(this.players));
     console.log(this.multi);
+  }
+
+  addPlayer(playerId: number) {
+    return this.api.GetPlayerGameweekScores(playerId).pipe(first()).toPromise();
   }
 
   onSelect(data): void {
