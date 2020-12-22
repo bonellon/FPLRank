@@ -1,14 +1,8 @@
-import {
-  Component,
-  OnInit,
-  ɵCompiler_compileModuleSync__POST_R3__,
-} from '@angular/core';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { Component, OnInit } from '@angular/core';
 import { FplApiService } from '../services/FplApiService';
 import { multi } from '../data';
-import { FplPlayerRank, Node, Series } from '../models/PlayerRank';
-import { Observable } from 'rxjs';
-import { first, take } from 'rxjs/operators';
+import { FplPlayer, GameweekScore, Node, Series } from '../models/PlayerRank';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'rank-comparison',
@@ -47,8 +41,8 @@ export class RankComparisonComponent implements OnInit {
   ngOnInit(): void {}
 
   addPlayerId() {
-    console.log(this.playerId);
     if (!this.playerIds.includes(this.playerId)) {
+      console.log('Adding player to playerIds:' + this.playerId);
       this.playerIds.push(this.playerId);
     }
 
@@ -59,23 +53,30 @@ export class RankComparisonComponent implements OnInit {
   async plotGraph() {
     var promiseArray = [];
     for await (var playerId of this.playerIds) {
-      console.log('Adding player: ' + playerId);
+      console.log('Will plot: ' + playerId);
 
-      if (this.players.find((p) => p.name == playerId.toString()) === undefined) {
-        promiseArray.push(this.addPlayer(playerId));
+      if (
+        this.players.find((p) => p.name == playerId.toString()) === undefined
+      ) {
+        console.log('Getting player from FPL : ' + playerId);
+        promiseArray.push(this.getPlayerDetails(playerId));
+      } else {
+        console.log('Skipping player:' + playerId);
       }
     }
 
     var fplPlayers = await Promise.all(promiseArray);
+    console.log(fplPlayers);
     fplPlayers.forEach((player) => {
-      this.players.push(
-        new Node(
-          playerId.toString(),
-          player.current.map(
-            (f) => new Series(f.total_points, f.event.toString())
+      if (this.players.find((p) => p.name == player.name) == undefined)
+        this.players.push(
+          new Node(
+            player.name,
+            player.scores.map(
+              (f) => new Series(f.total_points, f.event.toString())
+            )
           )
-        )
-      );
+        );
     });
 
     console.log(this.players);
@@ -83,8 +84,32 @@ export class RankComparisonComponent implements OnInit {
     console.log(this.multi);
   }
 
-  addPlayer(playerId: number) {
-    return this.api.GetPlayerGameweekScores(playerId).pipe(first()).toPromise();
+  async getPlayerDetails(playerId: number): Promise<FplPlayer> {
+    const data = await this.api
+      .GetPlayerDetails(playerId)
+      .pipe(first())
+      .toPromise();
+    var gameweeks = await this.addPlayer(playerId);
+    return new FplPlayer(
+      data['id'],
+      data['id'] +
+        ' - ' +
+        data['player_first_name'] +
+        ' ' +
+        data['player_last_name'],
+      gameweeks
+    );
+  }
+
+  async addPlayer(playerId: number): Promise<GameweekScore[]> {
+    const data = await this.api
+      .GetPlayerGameweekScores(playerId)
+      .pipe(first())
+      .toPromise();
+    var gameweeks = data['current'].map(
+      (gameweek) => gameweek as GameweekScore
+    );
+    return gameweeks;
   }
 
   onSelect(data): void {

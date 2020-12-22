@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, retry } from 'rxjs/operators';
-import { FplPlayerRank } from '../models/PlayerRank';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class FplApiService{
     
-    proxyurl = "https://cors-anywhere.herokuapp.com/";
-    baseUrl = "https://fantasy.premierleague.com/api/"
+    proxyurl = "";//"https://cors-anywhere.herokuapp.com/";
+    baseUrl = "https://fantasy.premierleague.com/api/";
 
     constructor(private http: HttpClient) { }
 
 
-    GetPlayerGameweekScores(playerId: number ) : Observable<FplPlayerRank>{
+    GetPlayerDetails(playerId: number) : Observable<Object>{
+        return this.http.get(this.proxyurl+this.baseUrl+"entry/"+playerId+"/")
+    }
 
-        return this.http.get<FplPlayerRank>(this.proxyurl+this.baseUrl+"entry/"+playerId+"/history/")
+    GetPlayerGameweekScores(playerId: number) : Observable<Object>{
+        return this.http.get(this.proxyurl+this.baseUrl+"entry/"+playerId+"/history/", )
     }
 
 

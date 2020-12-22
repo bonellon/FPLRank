@@ -1,8 +1,12 @@
-export class FplPlayerRank {
-    current : GameweekScore[];
+export class FplPlayer{
+    id : number;
+    name : string;
+    scores : GameweekScore[]
 
-    constructor(current : GameweekScore[]){
-        this.current = current;
+    constructor(id : number, name : string, scores : GameweekScore[]){
+        this.id = id;
+        this.name = name;
+        this.scores = scores;
     }
 }
 
@@ -18,6 +22,7 @@ export class GameweekScore {
     rank_sort: number;
     total_points : number;
     value : number;
+
 }
 
 export class Node {
