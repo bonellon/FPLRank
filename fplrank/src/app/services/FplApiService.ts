@@ -36,4 +36,20 @@ export class FplApiService {
     return gameweeks;
   }
 
+  async GetLeaguePlayerDetails(leagueId: number): Promise<number[]> {
+    var response = this.http.get(
+        this.baseUrl + 'leagues-classic/' + leagueId + '/standings/');
+  
+        var data = await response.pipe(first()).toPromise();
+        
+        var playerIds = [];
+        var players = data['standings']['results'];
+        console.log(players)
+        players.forEach(player => {
+            playerIds.push(player['entry'])
+        });
+
+        console.log(playerIds)
+        return playerIds;  
+    }
 }

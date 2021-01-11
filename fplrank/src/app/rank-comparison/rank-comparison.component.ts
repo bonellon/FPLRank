@@ -39,6 +39,13 @@ export class RankComparisonComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  async getLeague(){
+    
+    this.playerIds = await this.api.GetLeaguePlayerDetails(163980);
+  
+    console.log(this.playerIds);
+  }
+
   addPlayerId() {
     if (!this.playerIds.includes(this.playerId)) {
       console.log('Adding player to playerIds:' + this.playerId);
