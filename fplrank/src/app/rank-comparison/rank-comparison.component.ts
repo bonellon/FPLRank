@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FplApiService } from '../services/FplApiService';
 import { multi } from '../data';
-import { FplPlayer, GameweekScore, Node, Series } from '../models/PlayerRank';
-import { first } from 'rxjs/operators';
+import { Node, Series } from '../models/PlayerRank';
 
 @Component({
   selector: 'rank-comparison',
@@ -59,7 +58,7 @@ export class RankComparisonComponent implements OnInit {
         this.players.find((p) => p.name == playerId.toString()) === undefined
       ) {
         console.log('Getting player from FPL : ' + playerId);
-        promiseArray.push(this.getPlayerDetails(playerId));
+        promiseArray.push(this.api.GetPlayerDetails(playerId));
       } else {
         console.log('Skipping player:' + playerId);
       }
@@ -82,34 +81,6 @@ export class RankComparisonComponent implements OnInit {
     console.log(this.players);
     this.multi = JSON.parse(JSON.stringify(this.players));
     console.log(this.multi);
-  }
-
-  async getPlayerDetails(playerId: number): Promise<FplPlayer> {
-    const data = await this.api
-      .GetPlayerDetails(playerId)
-      .pipe(first())
-      .toPromise();
-    var gameweeks = await this.addPlayer(playerId);
-    return new FplPlayer(
-      data['id'],
-      data['id'] +
-        ' - ' +
-        data['player_first_name'] +
-        ' ' +
-        data['player_last_name'],
-      gameweeks
-    );
-  }
-
-  async addPlayer(playerId: number): Promise<GameweekScore[]> {
-    const data = await this.api
-      .GetPlayerGameweekScores(playerId)
-      .pipe(first())
-      .toPromise();
-    var gameweeks = data['current'].map(
-      (gameweek) => gameweek as GameweekScore
-    );
-    return gameweeks;
   }
 
   onSelect(data): void {

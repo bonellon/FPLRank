@@ -1,26 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { FplPlayer, GameweekScore } from '../models/PlayerRank';
+import { first } from 'rxjs/operators';
 
 @Injectable()
-export class FplApiService{
-    
-    proxyurl = "";//"https://cors-anywhere.herokuapp.com/";
-    baseUrl = "https://fantasy.premierleague.com/api/";
+export class FplApiService {
+  proxyurl = '';//'https://cors-anywhere.herokuapp.com/';
+  baseUrl = this.proxyurl + 'https://fantasy.premierleague.com/api/';
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
+  async GetPlayerDetails(playerId: number): Promise<FplPlayer> {
+    var response = this.http.get(this.baseUrl + 'entry/' + playerId + '/');
 
-    GetPlayerDetails(playerId: number) : Observable<Object>{
-        return this.http.get(this.proxyurl+this.baseUrl+"entry/"+playerId+"/")
-    }
+    var data = await response.pipe(first()).toPromise();
+    var gameweeks = await this.GetPlayerGameweekScores(playerId);
 
-    GetPlayerGameweekScores(playerId: number) : Observable<Object>{
-        return this.http.get(this.proxyurl+this.baseUrl+"entry/"+playerId+"/history/", )
-    }
+    return new FplPlayer(data['id'], 
+        data['id'] + ' - ' + data['player_first_name'] + ' ' + data['player_last_name'],
+        gameweeks
+    );
+  }
 
-    GetLeagueDetails(leagueId: number) : Observable<Object> {
-        return this.http.get(this.proxyurl+this.baseUrl+"leagues-classic/"+leagueId+"/standings/");
-    }
+  async GetPlayerGameweekScores(playerId: number): Promise<GameweekScore[]> {
+    var response = this.http.get(
+      this.baseUrl + 'entry/' + playerId + '/history/'
+    );
+
+    var data = await response.pipe(first()).toPromise();
+
+    var gameweeks = data['current'].map(
+      (gameweek) => gameweek as GameweekScore
+    );
+    return gameweeks;
+  }
 
 }
