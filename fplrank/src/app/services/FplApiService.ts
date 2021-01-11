@@ -19,5 +19,8 @@ export class FplApiService{
         return this.http.get(this.proxyurl+this.baseUrl+"entry/"+playerId+"/history/", )
     }
 
+    GetLeagueDetails(leagueId: number) : Observable<Object> {
+        return this.http.get(this.proxyurl+this.baseUrl+"leagues-classic/"+leagueId+"/standings/");
+    }
 
 }
