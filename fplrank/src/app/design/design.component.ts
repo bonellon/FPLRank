@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
+
+import { FplApiService } from '../services/FplApiService';
+import { multi } from '../data';
+import { FplPlayer, Node, Series } from '../models/PlayerRank';
+
 @Component({
   selector: 'app-design',
   templateUrl: './design.component.html',
@@ -8,6 +13,12 @@ import { Color, Label } from 'ng2-charts';
 })
 export class DesignComponent implements OnInit {
   ngOnInit() {}
+
+  constructor(private api: FplApiService) {
+    Object.assign(this, { multi });
+  }
+
+  playerIds: number[] = [];
 
   lineChartData: ChartDataSets[] = [
     {
@@ -19,31 +30,29 @@ export class DesignComponent implements OnInit {
     {
       data: [85, 78, 5, 35, 6, 125],
       label: 'Crude oil prices',
-      pointHoverRadius: 30,
+      pointHoverRadius: 3,
       fill: false,
     },
     {
       data: [1, 2, 3, 134, 55, 166, 157],
       label: 'Crude oil prices',
-      pointHoverRadius: 30,
+      pointHoverRadius: 3,
       fill: false,
     },
   ];
 
-  lineChartColors: Color[] = [
-    {
-      borderColor: 'black',
-      backgroundColor: 'rgba(255,255,0,0.28)',
-    },
-  ];
-
   lineChartLabels: Label[] = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '11',
   ];
 
   lineChartOptions = {
@@ -60,4 +69,90 @@ export class DesignComponent implements OnInit {
   lineChartLegend = true;
   lineChartPlugins = [];
   lineChartType = 'line';
+
+  async getLeague() {
+    this.playerIds = await this.api.GetLeaguePlayerDetails(163980);
+
+    console.log(this.playerIds);
+  }
+
+  players: Node[] = [];
+  multi: any[];
+  playerId: number = 1;
+
+  addPlayerId() {
+    if (!this.playerIds.includes(this.playerId)) {
+      console.log('Adding player to playerIds:' + this.playerId);
+      this.playerIds.push(this.playerId);
+    }
+
+    //Reset input
+    this.playerId = 1;
+  }
+
+  async plotGraph() {
+    var promiseArray = [];
+    for await (var playerId of this.playerIds) {
+      console.log('Will plot: ' + playerId);
+
+      if (
+        this.players.find((p) => p.name == playerId.toString()) === undefined
+      ) {
+        console.log('Getting player from FPL : ' + playerId);
+        promiseArray.push(this.api.GetPlayerDetails(playerId));
+      } else {
+        console.log('Skipping player:' + playerId);
+      }
+    }
+
+    var fplPlayers = await Promise.all(promiseArray);
+    console.log(fplPlayers);
+    fplPlayers.forEach((player) => {
+      if (this.players.find((p) => p.name == player.name) == undefined)
+        this.addNewPlayer(player);
+    });
+
+    console.log(this.players);
+    this.multi = JSON.parse(JSON.stringify(this.players));
+    console.log(this.multi);
+  }
+
+  addNewPlayer(player: FplPlayer) {
+    this.players.push(
+      new Node(
+        player.name,
+        player.scores.map((f) => new Series(f.total_points, f.event.toString()))
+      )
+    );
+
+    var x = this.lineChartData.find((p) => p.label == player.id.toString());
+    console.log(x);
+    if (x == undefined) {
+      var xx: ChartDataSets = {
+        label: player.id.toString(),
+        data: player.scores.map((s) => s.total_points),
+        pointHoverRadius: 3,
+        fill: false,
+        backgroundColor: "red",
+        pointHoverBackgroundColor : "green"
+      };
+
+      this.lineChartData.push(xx);
+    } else {
+      player.scores.forEach((score) => {
+        this.lineChartData
+          .find((p) => p.label == player.id.toString())
+          .data.push(score.total_points);
+      });
+    }
+  }
+
+  getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
 }
