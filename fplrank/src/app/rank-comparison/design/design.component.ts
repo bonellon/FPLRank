@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ChartDataSets, ChartOptions } from 'chart.js';
-import { Color, Label } from 'ng2-charts';
+import { ChartDataSets } from 'chart.js';
+import { Label } from 'ng2-charts';
+import { multi } from 'src/app/data';
+import { FplPlayer } from 'src/app/models/PlayerRank';
+import { Series } from "src/app/models/Series";
+import { FplApiService } from 'src/app/services/FplApiService';
 
-import { FplApiService } from '../services/FplApiService';
-import { multi } from '../data';
-import { FplPlayer, Node, Series } from '../models/PlayerRank';
+import {Node} from 'src/app/models/Node';
 
 @Component({
   selector: 'app-design',
@@ -14,11 +16,12 @@ import { FplPlayer, Node, Series } from '../models/PlayerRank';
 export class DesignComponent implements OnInit {
   ngOnInit() {}
 
-  constructor(private api: FplApiService) {
-    Object.assign(this, { multi });
-  }
+  constructor(){}
 
   playerIds: number[] = [];
+  players: Node[] = [];
+  multi: any[];
+  playerId: number = 1;
 
   lineChartData: ChartDataSets[] = [
     {
@@ -76,9 +79,7 @@ export class DesignComponent implements OnInit {
     console.log(this.playerIds);
   }
 
-  players: Node[] = [];
-  multi: any[];
-  playerId: number = 1;
+  
 
   addPlayerId() {
     if (!this.playerIds.includes(this.playerId)) {
@@ -134,7 +135,8 @@ export class DesignComponent implements OnInit {
         pointHoverRadius: 3,
         fill: false,
         backgroundColor: "red",
-        pointHoverBackgroundColor : "green"
+        pointHoverBackgroundColor : "green",
+        
       };
 
       this.lineChartData.push(xx);

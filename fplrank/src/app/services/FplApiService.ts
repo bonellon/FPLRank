@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { FplPlayer, GameweekScore } from '../models/PlayerRank';
+import { FplPlayer } from '../models/PlayerRank';
+import { GameweekScore } from "../models/GameweekScore";
 import { first } from 'rxjs/operators';
 
 @Injectable()
