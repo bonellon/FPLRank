@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
 
-
 @Component({
   selector: 'app-design',
   templateUrl: './design.component.html',
@@ -11,8 +10,7 @@ import { Label } from 'ng2-charts';
 export class DesignComponent implements OnInit {
   ngOnInit() {}
 
-  constructor(){}
-
+  constructor() {}
 
   lineChartData: ChartDataSets[] = [
     {
@@ -35,19 +33,7 @@ export class DesignComponent implements OnInit {
     },
   ];
 
-  lineChartLabels: Label[] = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '10',
-    '11',
-  ];
+  lineChartLabels: Label[] = [];
 
   lineChartOptions = {
     responsive: true,
@@ -58,14 +44,65 @@ export class DesignComponent implements OnInit {
     legend: {
       position: 'left',
     },
+    scales: {
+      xAxes: [
+        {
+          display: true,
+          scaleLabel: {
+            display: true,
+            labelString: 'Gameweek',
+          },
+        },
+      ],
+      yAxes: [
+        {
+          scaleLabel: {
+            display: true,
+            labelString: 'Total Points',
+          },
+          position: 'left',
+          ticks: {
+            min: 0, //minimum tick
+            max: 1000, //maximum tick
+          },
+        },
+      ],
+    },
   };
 
   lineChartLegend = true;
   lineChartPlugins = [];
   lineChartType = 'line';
 
-  updateDataset($event){
+  updateDataset($event) {
     console.log($event);
+    if (this.lineChartOptions.legend.position == 'right')
+      this.lineChartOptions.legend.position = 'left';
+    else this.lineChartOptions.legend.position = 'right';
+
     this.lineChartData = $event;
+    this.updateMaxDataScales();
+  }
+
+  updateMaxDataScales() {
+    console.log(this.lineChartData);
+    var maxHeight = 0;
+    var gameweeks = this.lineChartData[0].data.length;
+
+    this.lineChartData.forEach((d) => {
+      d.data.forEach((point) => {
+        if (point > maxHeight) maxHeight = point;
+      });
+    });
+
+    console.log(gameweeks);
+    this.lineChartOptions.scales.yAxes.forEach((x) => {
+      x.ticks.max = maxHeight;
+    });
+
+    for (var i = 1; i < gameweeks; i++) {
+      if (!(i.toString() in this.lineChartLabels))
+        this.lineChartLabels.push(i.toString());
+    }
   }
 }

@@ -89,11 +89,6 @@ export class RankEditComponent implements OnInit {
     );
 
     var x = this.lineChartData.find(p => p.label == player.id.toString());
-    var position = this.lineChartData.findIndex(p => p.label == player.id.toString());
-
-    console.log(position)
-    console.log(x);
-    console.log(this.lineChartData)
 
     if (x == undefined) {
       var xx: ChartDataSets = {
