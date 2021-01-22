@@ -9,20 +9,4 @@
         [plugins]="lineChartPlugins">
     </canvas>
 </div>
-<!-- Input field -->
-<input
-  type="number"
-  id="course"
-  name="course"
-  class="form-control"
-  [(ngModel)]="playerId"
-  placeholder="Enter course name"
-/>
-<hr />
-{{ playerIds | json }}
-
-<!-- Add button -->
-<button (click)="addPlayerId()">Add</button>
-
-<button (click)="plotGraph()">Plot graph</button>
-<button (click)="getLeague()">LEAGUE DATA</button>
+<rank-edit (dataEvent)="updateDataset($event)"></rank-edit>

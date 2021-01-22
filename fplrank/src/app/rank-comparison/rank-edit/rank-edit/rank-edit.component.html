@@ -1,1 +1,19 @@
 <p>rank-edit works!</p>
+
+<!-- Input field -->
+<input
+  type="number"
+  id="course"
+  name="course"
+  class="form-control"
+  [(ngModel)]="playerId"
+  placeholder="Enter course name"
+/>
+<hr />
+<button (click)="addPlayerId()">Add</button>
+
+<button (click)="plotGraph()">Plot graph</button>
+<button (click)="getLeague()">LEAGUE DATA</button>
+
+
+{{ playerIds | json }}
