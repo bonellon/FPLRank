@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
+import 'chartjs-plugin-zoom';
 
 @Component({
   selector: 'app-design',
@@ -68,10 +69,17 @@ export class DesignComponent implements OnInit {
         },
       ],
     },
+    zoom: {
+      enabled: true,         
+      mode: 'x',     
+    },
+    pan : {
+      enabled : true,         
+      mode: 'xy',  
+    }
   };
 
   lineChartLegend = true;
-  lineChartPlugins = [];
   lineChartType = 'line';
 
   updateDataset($event) {
