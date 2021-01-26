@@ -75,7 +75,16 @@ export class DesignComponent implements OnInit {
     },
     pan : {
       enabled : true,         
-      mode: 'xy',  
+      mode: 'xy',
+      rangeMin: {
+				x: 0,
+				y: 0
+			},
+			rangeMax: {
+				x: 15,
+				y: 2000
+			},
+      
     }
   };
 
@@ -107,6 +116,7 @@ export class DesignComponent implements OnInit {
     this.lineChartOptions.scales.yAxes.forEach((x) => {
       x.ticks.max = maxHeight;
     });
+    this.lineChartOptions.pan.rangeMax.x = gameweeks;
 
     for (var i = 1; i < gameweeks; i++) {
       if (!(i.toString() in this.lineChartLabels))
