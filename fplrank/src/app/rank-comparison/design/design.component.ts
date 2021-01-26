@@ -13,26 +13,7 @@ export class DesignComponent implements OnInit {
 
   constructor() {}
 
-  lineChartData: ChartDataSets[] = [
-    {
-      data: [85, 72, 78, 75, 77, 75],
-      label: 'Crude oil prices',
-      pointHoverRadius: 30,
-      fill: false,
-    },
-    {
-      data: [85, 78, 5, 35, 6, 125],
-      label: 'Crude oil prices',
-      pointHoverRadius: 3,
-      fill: false,
-    },
-    {
-      data: [1, 2, 3, 134, 55, 166, 157],
-      label: 'Crude oil prices',
-      pointHoverRadius: 3,
-      fill: false,
-    },
-  ];
+  lineChartData: ChartDataSets[] = [];
 
   lineChartLabels: Label[] = [];
 
@@ -40,7 +21,7 @@ export class DesignComponent implements OnInit {
     responsive: true,
     title: {
       display: true,
-      text: 'Chart.js Line Chart - Different point sizes',
+      text: 'Fantasy Premier League 2020/21 Team Points',
     },
     legend: {
       position: 'left',
