@@ -73,7 +73,6 @@ export class DesignComponent implements OnInit {
   lineChartType = 'line';
 
   updateDataset($event) {
-    console.log($event);
     if (this.lineChartOptions.legend.position == 'right')
       this.lineChartOptions.legend.position = 'left';
     else this.lineChartOptions.legend.position = 'right';
@@ -83,7 +82,6 @@ export class DesignComponent implements OnInit {
   }
 
   updateMaxDataScales() {
-    console.log(this.lineChartData);
     var maxHeight = 0;
     var gameweeks = this.lineChartData[0].data.length;
 
@@ -93,7 +91,6 @@ export class DesignComponent implements OnInit {
       });
     });
 
-    console.log(gameweeks);
     this.lineChartOptions.scales.yAxes.forEach((x) => {
       x.ticks.max = maxHeight;
     });

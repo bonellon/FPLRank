@@ -19,8 +19,9 @@ export class FplApiService {
     var gameweeks = await this.GetPlayerGameweekScores(playerId);
 
     return new FplPlayer(data['id'], 
-        data['id'] + ' - ' + data['player_first_name'] + ' ' + data['player_last_name'],
-        gameweeks
+        data['player_first_name'] + ' ' + data['player_last_name'],
+        gameweeks,
+        data['summary_overall_points']
     );
   }
 

@@ -5,6 +5,7 @@ import { ChartsModule } from 'ng2-charts';
 import { FormsModule } from '@angular/forms';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { RankEditComponent } from './rank-edit/rank-edit/rank-edit.component';
+import {MatTableModule} from '@angular/material/table';
 
 
 
@@ -14,6 +15,7 @@ import { RankEditComponent } from './rank-edit/rank-edit/rank-edit.component';
     RankEditComponent
   ],
   imports: [
+    MatTableModule,
     CommonModule,
     ChartsModule,
     FormsModule,

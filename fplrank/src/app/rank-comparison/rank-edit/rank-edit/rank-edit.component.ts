@@ -5,16 +5,20 @@ import { FplApiService } from 'src/app/services/FplApiService';
 import { ChartDataSets } from 'chart.js';
 import { Series } from 'src/app/models/Series';
 import { ColorHelper } from '@swimlane/ngx-charts';
+import { MatTableDataSource } from '@angular/material/table';
 
+export interface Player {
+  id: number;
+  name: string;
+  points: number;
+}
 
 @Component({
   selector: 'rank-edit',
   templateUrl: './rank-edit.component.html',
-  styleUrls: ['./rank-edit.component.scss']
+  styleUrls: ['./rank-edit.component.scss'],
 })
 export class RankEditComponent implements OnInit {
-  
-
   playerIds: number[] = [];
   players: Node[] = [];
   playerId: number = 1;
@@ -29,37 +33,29 @@ export class RankEditComponent implements OnInit {
     '#c3bb45',
     '#e0a339',
     '#e66b2d',
-    '#d92020'
-  ]
+    '#d92020',
+  ];
 
+  displayedColumns: string[] = ['id', 'name', 'points', 'test'];
+
+  tableData: Node[] = [];
+  dataSource = new MatTableDataSource<Node>(this.tableData);
 
   @Output() dataEvent = new EventEmitter<ChartDataSets[]>();
-  
-  constructor(private api: FplApiService) {
-  }
 
-  ngOnInit(): void {
-  }
+  constructor(private api: FplApiService) {}
+
+  ngOnInit(): void {}
 
   async getLeague() {
     this.playerIds = await this.api.GetLeaguePlayerDetails(163980);
-
-    console.log(this.playerIds);
   }
 
-  
-
-  addPlayerId() {
+  async addPlayerId() {
     if (!this.playerIds.includes(this.playerId)) {
-      console.log('Adding player to playerIds:' + this.playerId);
       this.playerIds.push(this.playerId);
     }
 
-    //Reset input
-    this.playerId = 1;
-  }
-
-  async plotGraph() {
     var promiseArray = [];
     for await (var playerId of this.playerIds) {
       if (
@@ -78,37 +74,45 @@ export class RankEditComponent implements OnInit {
         this.addNewPlayer(player);
     });
 
+    //Reset input
+    this.playerId = 1;
   }
 
-  addNewPlayer(player: FplPlayer) {
-    this.players.push(
-      new Node(
-        player.name,
-        player.scores.map((f) => new Series(f.total_points, f.event.toString()))
-      )
+  addNewPlayer(player : FplPlayer){
+    
+    var node = new Node(
+      player.id,
+      player.name,
+      player.scores.map((f) => new Series(f.total_points, f.event.toString()))
     );
 
-    var x = this.lineChartData.find(p => p.label == player.id.toString());
-
-    if (x == undefined) {
-      var xx: ChartDataSets = {
-        label: player.id.toString(),
-        data: player.scores.map((s) => s.total_points),
-        borderColor : this.lineChartColors[this.lineChartData.length],
-        pointBackgroundColor : this.lineChartColors[this.lineChartData.length],
-        fill : false
-      };
-
-      this.lineChartData.push(xx);
-    } else {
-      player.scores.forEach((score) => {
-        this.lineChartData
-          .find((p) => p.label == player.id.toString())
-          .data.push(score.total_points);
-      });
-    }
-
-    this.dataEvent.emit(this.lineChartData);
+    this.players.push(node);
+    this.tableData.push(node);
+    console.log(this.tableData);
+    this.dataSource = new MatTableDataSource<Node>(this.tableData);
+    console.log(this.tableData);
   }
 
+  async plotGraph() {
+    this.players.forEach((player) => {
+      var x = this.lineChartData.find((p) => p.label == player.id.toString());
+      console.log(this.lineChartData)
+      if (x == undefined) {
+        console.log(player);
+
+        var xx: ChartDataSets = {
+          label: player.id.toString(),
+          data: player.series.map((s) => s.value),
+          borderColor: this.lineChartColors[this.lineChartData.length],
+          pointBackgroundColor: this.lineChartColors[this.lineChartData.length],
+          fill: false,
+        };
+
+        this.lineChartData.push(xx);
+      } else {
+        console.log("player already exists")
+      }
+      this.dataEvent.emit(this.lineChartData);
+    });
+  }
 }
